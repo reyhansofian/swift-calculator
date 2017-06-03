@@ -9,31 +9,45 @@
 import UIKit
 
 class ViewController: UIViewController {
-    var isTyping = false
+    private var userIsTyping = false
     
-    @IBOutlet weak var display: UILabel!
+    @IBOutlet private weak var display: UILabel!
 
-    @IBAction func touchDigit(_ sender: UIButton) {
+    @IBAction private func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
         
-        if isTyping {
+        if userIsTyping {
             let textInDisplay = display.text!
             display.text = textInDisplay + digit
         } else {
             display.text = digit
         }
         
-        isTyping = true
+        userIsTyping = true
     }
     
-    @IBAction func performOperation(_ sender: UIButton) {
-        isTyping = false
-        if let mathSymbol = sender.currentTitle {
-            if mathSymbol == "π" {
-                display.text = String(M_PI)
-            }
+    private var displayValue: Double {
+        get {
+            return Double(display.text!)!
         }
-
+        
+        set{
+            display.text = String(newValue)
+        }
+    }
+    
+    private var brain = CalculatorBrain()
+    
+    @IBAction private func performOperation(_ sender: UIButton) {
+        if userIsTyping {
+            brain.setOperand(operand: displayValue)
+            userIsTyping = false
+        }
+        if let mathSymbol = sender.currentTitle {
+            brain.performOperation(symbol: mathSymbol)
+        }
+        
+        displayValue = brain.result
     }
 }
 
